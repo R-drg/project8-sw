@@ -1,0 +1,103 @@
+# project8-sw settings. This file sits next to project8-sw.nro.
+# Every value below is the one the release was tested with on an OLED Switch in
+# handheld mode. Change one at a time, and put it back if the game gets worse.
+
+# --- Renderer and frame rate -------------------------------------------------
+
+# Draw with the port's own Vulkan renderer. "xenos" uses the SDK's emulated
+# Xbox 360 GPU instead: correct but far too slow to play (1-5 fps).
+thps_renderer = "native"
+# An even 30 fps: at least two 60 Hz vblanks per frame (the game is otherwise
+# uncapped and its pacing is uneven).
+thps_min_frame_vblanks = 2
+# Hold a frame for the 30 fps cap before showing it rather than after, so
+# frames reach the screen evenly spaced. false is the previous behaviour.
+thps_pace_before_present = true
+# A late frame starts the next one at once instead of waiting for the next
+# 60 Hz tick (without it every late frame took 50 ms).
+guest_vblank_late_no_wait = true
+
+# --- GPU cost ------------------------------------------------------------------
+
+# One sample per pixel. true renders the game's multisampled targets with
+# their 2 samples: smoother edges, a lot more GPU time.
+thps_native_msaa = false
+# Upper bound on anisotropic texture filtering (1-16).
+thps_native_max_anisotropy = 2
+# Depth in 32 bits per pixel instead of 64; halved the GPU time of the main
+# scene.
+thps_native_depth24 = true
+# Make the draws' Vulkan calls on a second thread.
+thps_native_record_thread = true
+# Log GPU time by render pass (one frame in 16). For measuring only.
+thps_native_gpu_profile = false
+
+# --- The game's own waits ------------------------------------------------------
+# The Xbox 360 game spins while it waits; on the Switch a spinning thread takes
+# a core from the thread it is waiting for. These make it sleep or yield
+# instead, and return exactly what the original loop would have.
+
+guest_vblank_wait_sleep = true
+guest_job_wait_yield = true
+guest_swap_wait = true
+guest_ring_wait_backoff = true
+guest_ring_wait_event = true
+guest_render_wait_backoff = true
+timer_queue_blocking_wait = true
+# Native versions of two of the game's vertex unpacking functions, checked
+# against the originals during development.
+guest_u8x4_unpack_native = true
+guest_u8x4_unpack_verify = false
+guest_vertex_unpack_native = true
+guest_vertex_unpack_verify = false
+
+# --- System --------------------------------------------------------------------
+
+# The core the GPU command thread runs on.
+switch_cp_core = 2
+# 0 leaves the GPU clock to the system.
+switch_gpu_mhz = 0
+switch_stall_report = false
+switch_unwatch_hot_reads = false
+# The log in logs/ next to the NRO. "info" keeps the slow-frame reports, which
+# are what a performance bug report needs; "warn" writes less.
+log_level = "info"
+log_flush_level = "warn"
+
+# --- Emulated GPU path ---------------------------------------------------------
+# Only read with thps_renderer = "xenos". Kept as they were tested.
+
+gpu_cp_fastpath = true
+primitive_processor_cache_min_indices = 4096
+gpu_native_residency = true
+gpu_native_prefetch = true
+gpu_native_index = true
+gpu_native_vertex = true
+gpu_sampler_set_reuse = true
+gpu_texture_request_reuse = true
+gpu_texture_last_view_cache = true
+gpu_texture_descriptor_set_adjacent_reuse = true
+gpu_page_hash_validation = true
+gpu_page_hash_backoff = true
+gpu_stencil_transfer_used_bits = true
+gpu_depth_transfer_copy = true
+gpu_skip_transfers_under_clears = true
+gpu_skip_color_depth_transfers = true
+gpu_census_auto_swap = 0
+gpu_census_sequence_frames = 3
+switch_ab_lap_after_s = 0
+gpu_timestamp_queries = true
+async_shader_compilation = false
+vulkan_pipeline_creation_threads = 0
+gpu_resolve_to_texture = true
+gpu_force_1x_msaa = false
+gpu_specialize_texture_signs = true
+gpu_implicit_lod_sampling = true
+gpu_resolve_forward_storage = true
+# The game's own filtering; the SDK default forces 4x anisotropic + trilinear.
+anisotropic_override = -1
+gpu_hoist_vertex_uploads = true
+gpu_skip_transfers_under_opaque_rects = true
+gpu_timestamp_op_sampling = false
+occlusion_query_async = true
+gpu_submit_every_draws = 0
